@@ -1,20 +1,20 @@
 #!/bin/bash
 
-# Update system
-sudo apt update
+echo "Updating system..."
+sudo apt update -y
 
-# Install Docker
+echo "Installing Docker..."
 sudo apt install docker.io -y
 sudo systemctl start docker
 sudo systemctl enable docker
 sudo usermod -aG docker ubuntu
 
-# Create app folder
-mkdir app
-cd app
+echo "Creating app folder..."
+mkdir -p ~/app
+cd ~/app
 
-# Create Flask app
-cat <<EOF > app.py
+echo "Creating Flask app..."
+cat > app.py <<EOF
 from flask import Flask
 app = Flask(__name__)
 
@@ -26,11 +26,11 @@ if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
 EOF
 
-# Requirements file
+echo "Creating requirements.txt..."
 echo "flask" > requirements.txt
 
-# Dockerfile
-cat <<EOF > Dockerfile
+echo "Creating Dockerfile..."
+cat > Dockerfile <<EOF
 FROM python:3.10
 WORKDIR /app
 COPY . .
@@ -38,14 +38,14 @@ RUN pip install -r requirements.txt
 CMD ["python", "app.py"]
 EOF
 
-# Build Docker image
+echo "Building Docker image..."
 sudo docker build -t myapp .
 
-# Create volume folder
-mkdir ~/data
+echo "Creating volume folder..."
+mkdir -p ~/data
 echo "Hello from host volume" > ~/data/test.txt
 
-# Run container
+echo "Running container..."
 sudo docker run -d -p 5000:5000 -v ~/data:/data --name mycontainer myapp
 
 echo "✅ DONE! Open in browser: http://<your-public-ip>:5000"
